@@ -54,9 +54,27 @@
         </li>
     </ul>
 </aside>
+<script>
+    /*Page loader javascript*/
+document.onreadystatechange = function() { 
+            if (document.readyState !== "complete") { 
+                document.querySelector( 
+                  ".loader-block").style.visibility = "visible"; 
+            } else { 
+                document.querySelector( 
+                  ".loader-block").style.display = "none"; 
+                
+            } 
+        }; 
 
+</script>
 <div class="wrapper">
-
+    <div class="loader-block">
+        <div class="loading">
+          <div class="bounceball"></div>
+          <div class="loading-text">PAGE LOADING..</div>
+        </div>
+      </div>
 </div>
 <!-- partial -->
 <script src="https://d3js.org/d3.v4.js"></script>
