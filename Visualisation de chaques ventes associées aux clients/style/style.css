@@ -15,7 +15,7 @@
   }
   
   .axis .title {
-    font-size: 10px;
+    font-size: 17px;
     transform: rotate(-21deg) translate(-5px,-6px);
     fill: #222;
   }
@@ -35,11 +35,11 @@
   .axis.pl_facility .tick text,
   .axis.pl_instrument .tick text,
   .axis.st_spstr .tick text {
-    font-size: 6px; 
+    font-size: 16px; 
   }
   
   .axis.pl_telescope .tick text {
-    font-size: 5px; 
+    font-size: 15px; 
   }
   
   .axis:hover line,
@@ -79,6 +79,6 @@
     height: 300px;
     margin: 6px 12px;
     tab-size: 40;
-    font-size: 10px;
+    font-size: 17px;
     overflow: auto;
   }

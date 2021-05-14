@@ -1,7 +1,7 @@
 
 
 var myctr = document.getElementsByName("constructor");
-var margin = { top: 66, right: 110, bottom: 20, left: 0 },
+var margin = { top: 66, right: 110, bottom: 20, left: 40 },
     width = 1024,
     height = 800,
     innerHeight = height - 2;
