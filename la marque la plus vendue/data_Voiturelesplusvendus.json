@@ -1,0 +1,31 @@
+[{
+    "Var1": "BMW",
+    "Freq": 294455
+}, {
+    "Var1": "Audi",
+    "Freq": 291922
+}, {
+    "Var1": "Renault",
+    "Freq": 251612
+}, {
+    "Var1": "Jaguar",
+    "Freq": 189012
+}, {
+    "Var1": "Volkswagen",
+    "Freq": 155974
+}, {
+    "Var1": "Mercedes",
+    "Freq": 150183
+}, {
+    "Var1": "Volvo",
+    "Freq": 123848
+}, {
+    "Var1": "Peugeot",
+    "Freq": 96186
+}, {
+    "Var1": "Saab",
+    "Freq": 84536
+}, {
+    "Var1": "Fiat",
+    "Freq": 76609
+}]

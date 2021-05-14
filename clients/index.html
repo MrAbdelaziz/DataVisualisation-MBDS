@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>CodePen - Material Design - Sidebar (Profile menu)</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js" type="text/javascript"></script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+<link rel="stylesheet" href="../css/style.css">
+<script src="https://d3js.org/d3.v6.js"></script>
+
+
+</head>
+<body>
+<style>
+        .title {
+            fill: teal;
+            font-weight: bold;
+        }
+
+
+        .dropbtn {
+            background-color: #df1010;
+            color: rgb(240, 240, 240);
+            padding: 16px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .dropbtn:hover,
+        .dropbtn:focus {
+            background-color: #a71a1a;
+        }
+
+        .dropdown {
+            top: 70%;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f1f1f1;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #ddd
+        }
+
+        .show {
+            display: block;
+        }
+
+        .not-active {
+            pointer-events: none;
+            cursor: default;
+            text-decoration: none;
+            color: black;
+        }
+</style>
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-default open" role="navigation">
+    <!-- Sidebar navigation -->
+    <ul class="nav sidebar-nav">
+        <li>
+            <a href="/la marque la plus vendue">
+                <i class="sidebar-icon md-send"></i>
+                Pie : la marque la plus vendue
+            </a>
+        </li>
+        <li>
+            <a href="/Répartition des ventes pour chaque marque en fonction du prix et de la puissance">
+                <i class="sidebar-icon md-send"></i>
+                Bubble: Répartition des ventes pour chaque marque en fonction du prix et de la puissance
+            </a>
+        </li>
+        <li>
+            <a href="/Visualisation de chaques ventes associées aux clients">
+                <i class="sidebar-icon md-send"></i>
+                Visualisation de chaques ventes associées aux clients
+            </a>
+        </li>
+        <li>
+            <a href="/clients">
+                <i class="sidebar-icon md-send"></i>
+                Pie : clients
+            </a>
+        </li>
+        
+        <li>
+            <a href="/">
+                <i class="sidebar-icon md-send"></i>
+                MBDS Marrakech
+            </a>
+        </li>
+    </ul>
+</aside>
+
+<div class="wrapper">
+    <!-- Sidebar Constructor -->
+    <div class="constructor">
+        <h1 id="title"></h1>
+    
+        <svg width="600" height="400"></svg>
+        <div id="legendDiv"></div>
+        <div class="dropdown">
+            <button id="dropdownButton" onclick="dropDownFunction()" class="dropbtn"></button>
+            <div id="dropdownDiv" class="dropdown-content">
+            </div>
+        </div>
+    
+        <script type="text/javascript">
+    
+            buildChart('nbEnfantsAcharge');
+    
+            function addElementInDropdownButton(category, categoryList) {
+    
+                document.getElementById('dropdownButton').innerText = getCategoryForMenuList(category);
+                document.getElementById('dropdownDiv').innerHTML = '';
+    
+                categoryList.forEach(category => {
+                    var a = document.createElement('a');
+                    var linkText = document.createTextNode(category);
+                    a.appendChild(linkText);
+                    a.title = category;
+                    if (category !== "age" && category !== "id" && category !== "taux" && category !== "immatriculation")
+                        document.getElementById('dropdownDiv').append(a);
+                });
+            }
+    
+            function getCategoryForMenuList(category) {
+                switch (category) {
+                    case 'situationFamiliale':
+                        return 'Situation familiale';
+                    case 'nbEnfantsAcharge':
+                        return 'Nombre d\'enfants';
+                    case '2eme voiture':
+                        return 'Deuxième voiture';
+                    case 'sexe':
+                        return 'Sexe';
+                    default:
+                        return category;
+                }
+            }
+    
+            function getCategoryText(category) {
+                switch (category) {
+                    case 'situationFamiliale':
+                        return 'situation familiale';
+                    case 'nbEnfantsAcharge':
+                        return 'nombre d\'enfants à charge';
+                    case 'X2eme.voiture':
+                        return 'ayant une deuxième voiture';
+                    case 'sexe':
+                        return 'Sexe';
+                    default:
+                        return category;
+                }
+            }
+    
+            function getCategoryValue(category) {
+                switch (category) {
+                    case 'Situation familiale':
+                        return 'situationFamiliale';
+                    case 'Nombre d\'enfants':
+                        return 'nbEnfantsAcharge';
+                    case 'Deuxième voiture':
+                        return '2eme voiture';
+                    case 'Sexe':
+                        return 'sexe';
+                    default:
+                        return category;
+                }
+            }
+    
+            function buildChart(category) {
+                // Permet de clean le graphique avant d'en mettre un nouveau
+                d3.selectAll("svg > *").remove();
+    
+                // Je récupère le fichier json que j'ai en local
+                let request = new XMLHttpRequest();
+                request.open("GET", "clients.json", false);
+                request.send(null);
+                let dataJson = JSON.parse(request.responseText);
+                let categoryListForButton = [];
+                let categoryList = [];
+                let abscissMap = new Map();
+    
+                let categoryText = getCategoryText(category);
+    
+                // En fonction de la catégorie je met le nombre d'occurences dans une map
+                // et je remplis aussi une liste de toute les catégories pour le menu button
+    
+                let checkIfIsFirst = true;
+                dataJson.forEach(
+                    data => {
+                        if (checkIfIsFirst) {
+                            for (let keyValue in data) {
+                                categoryListForButton.push(getCategoryForMenuList(keyValue));
+                                categoryList.push(keyValue);
+                            }
+                            checkIfIsFirst = false;
+                        }
+                        let value = abscissMap.get(data[category]);
+                        if (value !== undefined) {
+                            abscissMap.set(data[category], abscissMap.get(data[category]) + 1);
+                        } else {
+                            abscissMap.set(data[category], 1);
+                        }
+                    });
+    
+                // Transformer en array
+                // Je transforme ma map en json pour qu'on puisse la réutiliser dans le barChart
+                let data = [];
+                let maxValue = 0;
+                for (let [key, value] of abscissMap) {
+                    data.push({ categoryType: key, categoryValue: value });
+                    maxValue = maxValue + value;
+                }
+    
+                addElementInDropdownButton(category, categoryListForButton);
+    
+                // Draw Graph
+                let color = d3.scaleOrdinal(['#ff0000', '#ffa500', '#ffff00', '#008000', '#0000ff', '#4b0082', '#ee82ee']);
+    
+                let svg = d3.select("svg"),
+                    width = svg.attr("width"),
+                    height = svg.attr("height"),
+                    radius = Math.min(width, height) / 2,
+                    g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+    
+                let pie = d3.pie()
+                    .value(function (d) {
+                        return d.categoryValue;
+                    })
+                    .padAngle(0.03);
+    
+    
+                let arc = d3.arc()
+                    .outerRadius(radius)
+                    .innerRadius(0);
+    
+                let label = d3.arc()
+                    .outerRadius(radius)
+                    .innerRadius(radius - 80);
+    
+                let arcs = g.selectAll(".arc")
+                    .data(pie(data))
+                    .enter().append("g")
+                    .attr("class", "arc");
+    
+                arcs.append("path")
+                    .attr("d", arc)
+                    .attr("fill", function (d) {
+                        return color(d.data.categoryType);
+                    });
+    
+                arcs.append("text")
+                    .attr("transform", function (d) {
+                        return "translate(" + label.centroid(d) + ")";
+                    })
+                    .text(function (d) {
+                        let valuePercent = (d.data.categoryValue * 100 / maxValue).toFixed(2);
+                        if (valuePercent > 4)
+                            return valuePercent + '%';
+                        else
+                            return '';
+                    });
+                    
+                    document.getElementById("legendDiv").innerHTML="";
+
+                var legend = d3.select("#legendDiv").append("svg")
+                    .attr("class", "legend")
+                    .selectAll("g")
+                    .data(data)
+                    .enter().append("g")
+                    .attr("transform", function (d, i) {
+                        return "translate(0," + i * 20 + ")";
+                    });
+    
+                legend.append("rect")
+                    .attr("width", 18)
+                    .attr("height", 18)
+                    .style("fill", function (d, i) {
+                        return color(d.categoryType);
+                    });
+    
+                legend.append("text")
+                    .attr("x", 24)
+                    .attr("y", 9)
+                    .attr("dy", ".35em")
+                    .text(function (d) {
+                        return d.categoryType + ' ' + categoryText;
+                    });
+    
+                document.getElementById("title").innerText = "Nombre de clients en fonction de leurs " + categoryText;
+            }
+    
+            function dropDownFunction() {
+                document.getElementById("dropdownDiv").classList.toggle("show");
+            }
+    
+            window.onclick = function (event) {
+                if (!event.target.matches('.dropbtn')) {
+                    var dropdowns = document.getElementsByClassName("dropdown-content");
+                    var i;
+                    for (i = 0; i < dropdowns.length; i++) {
+                        var openDropdown = dropdowns[i];
+                        if (openDropdown.classList.contains('show')) {
+                            openDropdown.classList.remove('show');
+                            buildChart(getCategoryValue(event.target.innerText));
+                        }
+                    }
+                }
+            }
+        </script>
+    </div>
+</div>
+<!-- partial -->
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+<script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js'></script><script  src="../js/script.js"></script>
+
+</body>
+</html>
