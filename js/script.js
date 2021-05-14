@@ -129,3 +129,16 @@ $(document).ready(function() {
 	}
 
 })(jQuery.fn.removeClass);
+
+
+    /*Page loader javascript*/
+    document.onreadystatechange = function() { 
+        if (document.readyState !== "complete") { 
+            document.querySelector( 
+              ".loader-block").style.visibility = "visible"; 
+        } else { 
+            document.querySelector( 
+              ".loader-block").style.display = "none"; 
+            
+        } 
+    }; 
